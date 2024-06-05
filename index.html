@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería de Arte</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // Crear una escena
+        const scene = new THREE.Scene();
+        
+        // Crear una cámara
+        const camera = new THREE.PerspectiveCamera(77, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 4.5;
+
+        // Crear un renderizador
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        
+        // Crear fondo estrellado
+        const starTexture = new THREE.TextureLoader().load('stars.jpg');
+        const starMaterial = new THREE.MeshBasicMaterial({ map: starTexture, side: THREE.BackSide });
+        const starGeometry = new THREE.SphereGeometry(1000, 64, 64);
+        const starField = new THREE.Mesh(starGeometry, starMaterial);
+        scene.add(starField);
+
+        const floorTexture = new THREE.TextureLoader().load('piso2.jpg');
+        // Crear material con la textura
+        const floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture });
+
+        // Crear plano para el piso
+        const floorGeometry = new THREE.PlaneGeometry(10, 10);
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = -Math.PI / 2; // Rotar el plano para que esté horizontal
+        floor.position.y = -1; // Posicionar el plano debajo de la habitación
+        scene.add(floor);
+
+        // Cargar textura para las paredes
+        const textureLoader = new THREE.TextureLoader();
+        let wallTexture = textureLoader.load('textura.jpg'); // Ruta de la imagen de la textura de la pared
+        const wallMaterial = new THREE.MeshBasicMaterial({ map: wallTexture });
+
+        // Crear paredes
+        const wall1Geometry = new THREE.BoxGeometry(0.1, 2, 4);
+        const wall1 = new THREE.Mesh(wall1Geometry, wallMaterial);
+        wall1.position.set(-2.30, 0, 0); // Coordenadas para la pared izquierda
+        scene.add(wall1);
+
+        const wall2Geometry = new THREE.BoxGeometry(0.1, 2, 4);
+        const wall2 = new THREE.Mesh(wall2Geometry, wallMaterial);
+        wall2.position.set(2.45, 0, 0); // Coordenadas para la pared derecha
+        scene.add(wall2);
+
+        const wall3Geometry = new THREE.BoxGeometry(4, 2, 0.1);
+        const wall3 = new THREE.Mesh(wall3Geometry, wallMaterial);
+        wall3.position.set(0, 0, -2.45); // Coordenadas para la pared trasera
+        scene.add(wall3);
+
+        const wall4Geometry = new THREE.BoxGeometry(4, 2, 0.1);
+        const wall4 = new THREE.Mesh(wall4Geometry, wallMaterial);
+        wall4.position.set(0, 0, 2.45); // Coordenadas para la pared frontal
+        scene.add(wall4);
+
+        const wallMeshes = [wall1, wall2, wall3, wall4]; // Array con las paredes
+
+        // Crear cuadros con imágenes
+        const image1Texture = textureLoader.load('vang.jpg');
+        const image1Material = new THREE.MeshBasicMaterial({ map: image1Texture });
+        const image1 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), image1Material);
+        image1.position.set(-1, 0.3, -2); // Coordenadas para el primer cuadro
+        scene.add(image1);
+
+        const image2Texture = textureLoader.load('girasoless.jpg'); // ruta de tu imagen
+        const image2Material = new THREE.MeshBasicMaterial({ map: image2Texture });
+        const image2 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), image2Material);
+        image2.position.set(1, 0.3, -2); // Coordenadas para el segundo cuadro
+        scene.add(image2);
+
+        const image3Texture = textureLoader.load('monet1.jpg');
+        const image3Material = new THREE.MeshBasicMaterial({ map: image3Texture });
+        const image3 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), image3Material);
+        image3.position.set(-1, 0.3, 2); // Coordenadas para el tercer cuadro
+        image3.rotation.y = Math.PI; // Rotar el cuadro para que se vea de frente
+        scene.add(image3);
+
+        const image4Texture = textureLoader.load('monet2.jpg');
+        const image4Material = new THREE.MeshBasicMaterial({ map: image4Texture });
+        const image4 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), image4Material);
+        image4.position.set(1, 0.3, 2); // Coordenadas para el cuarto cuadro
+        image4.rotation.y = Math.PI; // Rotar el cuadro para que se vea de frente
+        scene.add(image4);
+
+        const image5Texture = textureLoader.load('par.jpg');
+        const image5Material = new THREE.MeshBasicMaterial({ map: image5Texture });
+        const image5 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), image5Material);
+        image5.position.set(-2, 0.3, 1); // Alinear con la pared izquierda y hacia adelante
+        image5.rotation.y = Math.PI / 2; // Rotar 90 grados hacia la izquierda
+        scene.add(image5);
+
+        const image6Texture = textureLoader.load('puente.jpg');
+        const image6Material = new THREE.MeshBasicMaterial({ map: image6Texture });
+        const image6 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), image6Material);
+        image6.position.set(-2, 0.3, -1); // Alinear con la pared izquierda y al centro
+        image6.rotation.y = Math.PI / 2; // Rotar 90 grados hacia la izquierda
+        scene.add(image6);
+
+        const image7Texture = textureLoader.load('pajr.jpg');
+        const image7Material = new THREE.MeshBasicMaterial({ map: image7Texture });
+        const image7 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), image7Material);
+        image7.position.set(2.3, 0.35, 1); // Coordenadas para el primer cuadro en la pared derecha
+        image7.rotation.y = -Math.PI / 2; // Rotar 90 grados hacia la derecha
+        scene.add(image7);
+
+        const image8Texture = textureLoader.load('perrito.jpg');
+        const image8Material = new THREE.MeshBasicMaterial({ map: image8Texture });
+        const image8 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), image8Material);
+        image8.position.set(2.3, 0.35, -1); // Coordenadas para el segundo cuadro en la pared derecha
+        image8.rotation.y = -Math.PI / 2; // Rotar 90 grados hacia la derecha
+        scene.add(image8);
+
+        const images = [image1, image2, image3, image4, image5, image6, image7, image8];
+
+        // Añadir una luz
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight.position.set(5, 3, 5);
+        scene.add(directionalLight);
+
+        // Añadir controles OrbitControls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableRotate = true;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        controls.minPolarAngle = 0; // Limitar el ángulo mínimo de rotación
+        controls.maxPolarAngle = Math.PI; // Limitar el ángulo máximo de rotación
+
+        // Añadir eventos de teclado
+        document.addEventListener('keydown', (event) => {
+            const keyCode = event.code;
+            switch (keyCode) {
+                case 'KeyW':
+                    camera.translateZ(-0.1); // Mover hacia adelante
+                    break;
+                case 'KeyS':
+                    camera.translateZ(0.1); // Mover hacia atrás
+                    break;
+                case 'ArrowUp':
+                    camera.position.y += 0.1; // Mover hacia arriba
+                    break;
+                case 'ArrowDown':
+                    camera.position.y -= 0.1; // Mover hacia abajo
+                    break;
+                case 'KeyA':
+                    camera.translateX(-0.1); // Mover hacia la izquierda
+                    break;
+                case 'KeyD':
+                    camera.translateX(0.1); // Mover hacia la derecha
+                    break;
+            }
+        });
+
+        // Añadir eventos de ratón
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let intersectedObject = null;
+
+        const onMouseMove = (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(images);
+
+            if (intersects.length > 0) {
+                if (intersectedObject != intersects[0].object) {
+                    if (intersectedObject) {
+                        intersectedObject.material.opacity = 1.0; // Restablecer opacidad
+                    }
+                    intersectedObject = intersects[0].object;
+                    intersectedObject.material.opacity = 0.7; // Cambiar opacidad para destacar
+                }
+            } else {
+                if (intersectedObject) {
+                    intersectedObject.material.opacity = 1.0; // Restablecer opacidad
+                }
+                intersectedObject = null;
+            }
+        };
+
+        const onClick = () => {
+            if (intersectedObject) {
+                wallTexture = intersectedObject.material.map;
+                wallMeshes.forEach(wall => {
+                    wall.material.map = wallTexture;
+                    wall.material.needsUpdate = true;
+                });
+            }
+        };
+
+        document.addEventListener('mousemove', onMouseMove, false);
+        document.addEventListener('click', onClick, false);
+
+        // Función de renderizado
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>

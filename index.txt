@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escenario de Cuadros de Arte</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        const WIDTH = window.innerWidth;
+        const HEIGHT = window.innerHeight;
+        const WALL_COLOR = 0xeeeeee;
+        const ART_FRAME_SIZE = 1;
+        const ROOM_SIZE = 10;
+
+        // Configurar la escena
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 0.01, 100);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(WIDTH, HEIGHT);
+        document.body.appendChild(renderer.domElement);
+
+        // Agregar luces
+        function addLights() {
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(0, 1, 1);
+            scene.add(directionalLight);
+        }
+
+        // Crear cuadro de arte
+        function createArtFrame(texture) {
+            const geometry = new THREE.BoxGeometry(ART_FRAME_SIZE, ART_FRAME_SIZE, 0.1);
+            const material = new THREE.MeshStandardMaterial({ map: texture });
+            const artFrame = new THREE.Mesh(geometry, material);
+            artFrame.position.set(0, 0, -4  );
+            scene.add(artFrame);
+        }
+
+        // Crear paredes del cuarto
+        function createRoomWalls() {
+            const wallMaterial = new THREE.MeshStandardMaterial({ color: WALL_COLOR });
+            const wallGeometry = new THREE.BoxGeometry(ROOM_SIZE, ROOM_SIZE / 2, 0.1);
+
+            const wallFront = new THREE.Mesh(wallGeometry, wallMaterial);
+            const wallBack = new THREE.Mesh(wallGeometry, wallMaterial);
+            const wallLeft = new THREE.Mesh(new THREE.BoxGeometry(0.1, ROOM_SIZE / 2, ROOM_SIZE), wallMaterial);
+            const wallRight = new THREE.Mesh(new THREE.BoxGeometry(0.1, ROOM_SIZE / 2, ROOM_SIZE), wallMaterial);
+            const wallCeiling = new THREE.Mesh(new THREE.BoxGeometry(ROOM_SIZE + 0.2, 0.1, ROOM_SIZE), wallMaterial);
+
+            wallFront.position.set(0, 0, -ROOM_SIZE / 2);
+            wallBack.position.set(0, 0, ROOM_SIZE / 2);
+            wallLeft.position.set(-ROOM_SIZE / 2, 0, 0);
+            wallRight.position.set(ROOM_SIZE / 2, 0, 0);
+            wallCeiling.position.set(0, ROOM_SIZE / 4, 0);
+
+            scene.add(wallFront);
+            scene.add(wallBack);
+            scene.add(wallLeft);
+            scene.add(wallRight);
+            scene.add(wallCeiling);
+        }
+
+        // Crear el piso
+        function createFloor() {
+            const floorGeometry = new THREE.PlaneGeometry(ROOM_SIZE, ROOM_SIZE);
+            const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x808080, side: THREE.DoubleSide });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = Math.PI / 2;
+            floor.position.y = -ROOM_SIZE / 4;
+            scene.add(floor);
+        }
+
+        // Cargar la textura de la imagen y comenzar el renderizado después de cargarla
+        const loader = new THREE.TextureLoader();
+        loader.load('pintura.jpg', (texture) => {
+            createArtFrame(texture);
+            renderer.render(scene, camera);
+        });
+
+        // Configurar controles de cámara
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        camera.position.z = 5;
+
+        // Manejar eventos de teclado para mover la cámara
+        document.addEventListener('keydown', (event) => {
+            const velocity = 0.1;
+            if (event.key === 'w') {
+                camera.translateZ(-velocity);
+            } else if (event.key === 's') {
+                camera.translateZ(velocity);
+            }
+        });
+
+        // Renderizar la escena
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Inicializar luces, paredes del cuarto y el piso
+        addLights();
+        createRoomWalls();
+        createFloor();
+    </script>
+</body>
+</html>
